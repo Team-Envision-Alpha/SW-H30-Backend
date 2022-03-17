@@ -111,6 +111,7 @@ const resolvers = {
                 throw new Error(err)
             }
         },
+         // update user data - @access authenticated user
         async updateUser(_,{id,email,phone,name,role,department},context){
             try{
                 await isAuthenticated(context)
@@ -129,6 +130,7 @@ const resolvers = {
                 throw new Error(err)
             } 
         },
+         // update user password - @access only admin
         async updateUserPassword(_,{id,password},context){
             try{
                 if(!(id && password)){
@@ -143,6 +145,7 @@ const resolvers = {
                 throw new Error(err)
             }
         },
+         // delete user - @access only admin
         async deleteUser(_,{id},context){
             try{
                 if(!id){
