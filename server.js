@@ -4,11 +4,13 @@ const { ApolloServer } = require("apollo-server-express");
 const {
   ApolloServerPluginLandingPageGraphQLPlayground,
 } = require("apollo-server-core");
+const { connectDB } = require("./db");
 
 
 async function startApolloServer() {
   const server = new ApolloServer({
     modules: [
+      require('./modules/users')
     ],
     context: ({ req }) => ({ req }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
@@ -17,9 +19,10 @@ async function startApolloServer() {
   await server.start();
   server.applyMiddleware({ app });
   require("dotenv").config();
+  connectDB()
   app.use(cors({ origin: true }));
-  
-  app.listen({ port: process.env.PORT || 4000 }, () => {
+
+  app.listen({ port: process.env.PORT || 4001 }, () => {
     console.log("Server up");
   });
 }
