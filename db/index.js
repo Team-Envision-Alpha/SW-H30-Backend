@@ -17,8 +17,16 @@ async function connectDB() {
     console.log("DB Connected!");
 
     const userQuery = "create table if not exists aicte.users (id UUID PRIMARY KEY,name text,email text,phone text,role text,password text,department text)"
+    const eventQuery = "create table if not exists aicte.events (id UUID PRIMARY KEY,name text,caption text,description text,venue UUID,organiser UUID,datetime text,image text)"
+    const venueQuery = "create table if not exists aicte.venues (id UUID PRIMARY KEY,name text,contact text,state text,city text,pincode text,staffcount text,capacity text)"
+    const venueAvailibility = "create table if not exists aicte.venue_availibility (venueID UUID PRIMARY KEY,eventID UUID,datetime text)"
+    const inviteQuery = "create table if not exists aicte.invited_users (userId UUID PRIMARY KEY,name text,email text,phone text,eventId UUID)"
     
     await dbClient.execute(userQuery,[])
+    await dbClient.execute(eventQuery,[])
+    await dbClient.execute(venueQuery,[])
+    await dbClient.execute(venueAvailibility,[])
+    await dbClient.execute(inviteQuery,[])
   } catch (err) {
     console.log(err);
   }

@@ -27,6 +27,7 @@
     "graphql-upload": "^13.0.0",
     "jsonwebtoken": "^8.5.1",
     "node-cassandra": "^0.4.2",
+    "sharp": "^0.30.3",
     "uuid": "^8.3.2"
   },
   "bugs": {
