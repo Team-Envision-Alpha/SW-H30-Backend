@@ -1,0 +1,36 @@
+{
+  "name": "sw-h30-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Team-Envision-Alpha/SW-H30-Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^3.6.3",
+    "apollo-server-core": "^3.6.3",
+    "apollo-server-express": "^3.6.3",
+    "bcryptjs": "^2.4.3",
+    "cassandra-driver": "^4.6.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-cassandra": "^2.7.0",
+    "graphql": "^16.3.0",
+    "graphql-upload": "^13.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "node-cassandra": "^0.4.2",
+    "uuid": "^8.3.2"
+  },
+  "bugs": {
+    "url": "https://github.com/Team-Envision-Alpha/SW-H30-Backend/issues"
+  },
+  "homepage": "https://github.com/Team-Envision-Alpha/SW-H30-Backend#readme"
+}
