@@ -3,6 +3,7 @@ const { dbClient } = require("../db");
 const uuid = require('uuid')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
+const { isAdmin, isAuthenticated } = require("../validators/auth");
 const { AuthenticationError, UserInputError } = require("apollo-server-core");
 
 const typeDefs = gql`
@@ -27,12 +28,16 @@ const typeDefs = gql`
   }
   # user Queries 
   extend type Query {
+    getUser: User!
     getAllUsers: [User]
   }
   # user Mutations 
   extend type Mutation{
     registerUser(userInput: UserInput): User! 
     loginUser(email: String!,password: String!) : User!
+    updateUser(id:ID!,name:String!,email:String,role:String!,department:String!,phone:String!): User! 
+    updateUserPassword(id:ID!): String! 
+    deleteUser(id:ID!): String! 
   }
 `
 
@@ -41,6 +46,7 @@ const resolvers = {
         // get all users - @access admin
         async getAllUsers(_,args,context){
             try{
+                const user = await isAdmin(context)
                 // console.log(user);
                 const query = 'select * from aicte.users'
                 const result = await dbClient.execute(query,[])
@@ -49,6 +55,15 @@ const resolvers = {
                 throw new Error(err)
             }
         },
+        // get single user - @access authenticated user
+        async getUser(_,args,context){
+            try{
+                const user = await isAuthenticated(context)
+                return user
+            }catch(err){
+                throw new Error(err)
+            }
+        }
     },
     Mutation:{
         // register user - @access only admin
@@ -92,6 +107,51 @@ const resolvers = {
                 }
                 const token = jwt.sign({...user.rows[0]},process.env.JWT_SECRET,{expiresIn:"5d"})
                 return {...user.rows[0],token}
+            }catch(err){
+                throw new Error(err)
+            }
+        },
+        async updateUser(_,{id,email,phone,name,role,department},context){
+            try{
+                await isAuthenticated(context)
+                if(!(email && phone && name && id && role && department)){
+                    throw new UserInputError("Missing Fields!")
+                }
+                const findUser = `select * from aicte.users where email = ? allow filtering`
+                const user = await dbClient.execute(findUser,[email])
+                if(!user.rowLength){
+                    throw new Error("User Doesn't Exists!!")
+                }
+                const query = 'update aicte.users set email = ?, phone = ?, name = ?, role = ?, department = ? where id = ?'
+                await dbClient.execute(query,[email,phone,name,role,department,id])
+                return {id,name,email,phone,role,department}
+            }catch(err){
+                throw new Error(err)
+            } 
+        },
+        async updateUserPassword(_,{id,password},context){
+            try{
+                if(!(id && password)){
+                    throw new UserInputError("Missing Fields!")
+                }
+                await isAdmin(context)
+                password = await bcrypt.hash(password,12)
+                const query = "update aicte.users set password = ?, where id = ?"
+                await dbClient.execute(query,[password,id])
+                return "Password Updated Successfully!"
+            }catch(err){
+                throw new Error(err)
+            }
+        },
+        async deleteUser(_,{id},context){
+            try{
+                if(!id){
+                    throw new UserInputError("Missing User ID!")
+                }
+                await isAuthenticated(context)
+                const query = "delete from aicte.users where id = ?"
+                await dbClient.execute(query,[id])
+                return "User Deleted Successfully!"
             }catch(err){
                 throw new Error(err)
             }
