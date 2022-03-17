@@ -10,7 +10,8 @@ const { connectDB } = require("./db");
 async function startApolloServer() {
   const server = new ApolloServer({
     modules: [
-      require('./modules/users')
+      require('./modules/users'),
+      require('./modules/events')
     ],
     context: ({ req }) => ({ req }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
