@@ -7,24 +7,43 @@ const { uploadImage, deleteImage } = require("../utils/image");
 
 const typeDefs = gql`
   # events typeDefs 
+  input InvitedUserInput {
+    email: String!
+    name: String!
+    phone: String!
+}
+  type InvitedUser {
+    email: String!
+    name: String!
+    phone: String!
+}
   input EventInput {
     name: String!
     description: String!
     venue: ID!
-    organiser: String!
+    organiser: ID!
     caption: String!
-    datetime: String!
+    fromdate: String!
+    todate: String!
+    time: String!
     image: String!
+    departmentInvited:[String]
+    usersInvited:[InvitedUserInput]
+    status:String!
   }
   type Event {
     id: ID!
     name: String!
     description: String!
     venue: ID!
-    organiser: String!
+    organiser: ID!
     caption: String!
     datetime: String!
     image:String!
+    status:String!
+    fromdate: String!
+    todate: String!
+    time: String!
   }
   # event Queries 
   extend type Query {
@@ -63,34 +82,60 @@ const resolvers = {
         },
     },
     Mutation:{
-        async createEvent(_,{eventInput:{name,description,venue,organiser,caption,datetime,image}},context){
+        async createEvent(_,{eventInput:{name,description,venue,organiser,caption,fromdate,todate,time,image,status,usersInvited,departmentInvited}},context){
             try{
-                await isAuthenticated(context)
-                if(!(name && description && venue && organiser && caption && datetime && image)){
+                // await isAuthenticated(context)
+                if(!(name && description && venue && organiser && caption && fromdate && todate && image && status)){
                     throw new UserInputError("Missing Fields!")
                 }
+                console.log(name)
                 const id = uuid.v4()
                 const image_url = await uploadImage(image,id)
-                const query = "insert into aicte.events (id,name,description,venue,organiser,caption,datetime,image) values (?,?,?,?,?,?,?,?)"
-                await dbClient.execute(query,[id,name,description,venue,organiser,caption,datetime,image_url])
-                return {id,name,description,venue,organiser,caption,datetime,image:image_url}
+                const query = "insert into aicte.events (id,name,description,venue,organiser,caption,fromdate,todate,time,image,status) values (?,?,?,?,?,?,?,?,?,?,?)"
+                await dbClient.execute(query,[id,name,description,venue,organiser,caption,fromdate,todate,time,image_url,status])
+                let queries = []
+                queries = await usersInvited.map(({name,email,phone})=>{
+                    return {
+                        query:"insert into aicte.invited_users (eventId,name,email,phone) values (?,?,?,?)",
+                        params:[id,name,email,phone]
+                    }   
+                })
+                // console.log(queries);
+                // let users_by_department = []
+                // users_by_department = departmentInvited.map(async departmemt=>{
+                //     const q = 'select email,phone,name from aicte.users where department = ? allow filtering'
+                //     const users = await dbClient.execute(q,[departmemt])
+                //     return users.rows
+                // })
+                // console.log(users_by_department);
+                // await users_by_department.forEach((userArray)=>{
+                //     console.log(userArray);
+                //     // userArray.forEach(({name,email,phone})=>{
+                //     //     queries.push({
+                //     //         query:"insert into aicte.invited_users (eventId,name,email,phone) values (?,?,?,?)",
+                //     //         params:[id,name,email,phone]
+                //     //     })
+                //     // })
+                // })
+                await dbClient.batch(queries)
+                return {id,name,description,venue,organiser,caption,fromdate,todate,time,image:image_url}
             }catch(err){
                 throw new Error(err)
             }
         },
-        async updateEvent(_,{id,eventInput:{name,description,venue,organiser,caption,datetime,image}},context){
+        async updateEvent(_,{id,eventInput:{name,description,venue,organiser,caption,fromdate,todate,time,image}},context){
             try{
                 await isAuthenticated(context)
-                if(!(id && name && description && venue && organiser && caption && datetime && image)){
+                if(!(id && name && description && venue && organiser && caption && fromdate && todate && time && image)){
                     throw new UserInputError("Missing Fields!")
                 }
                 if(!image.includes(id)){
                     await deleteImage(id)
                     image = await uploadImage(image,id)
                 }
-                const query = "update aicte.events set name = ?, description = ?, venue = ?, organiser=? caption = ?, datetime = ? where id = ?"
-                await dbClient.execute(query,[name,description,venue,organiser,caption,datetime,id])
-                return {id,name,description,venue,organiser}
+                const query = "update aicte.events set name = ?, description = ?, venue = ?, organiser=? caption = ?, fromdate = ?,todate = ?, time = ? where id = ?"
+                await dbClient.execute(query,[name,description,venue,organiser,caption,fromdate,todate,time,id])
+                return {id,name,description,venue,organiser,caption,fromdate,todate,time}
             }catch(err){
                 throw new Error(err)
             }

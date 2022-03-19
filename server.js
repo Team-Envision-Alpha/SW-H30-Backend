@@ -15,6 +15,7 @@ async function startApolloServer() {
       require("./modules/events"),
       require("./modules/venue"),
       require("./modules/invite"),
+      require("./modules/chats"),
     ],
     context: ({ req }) => ({ req }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
@@ -24,6 +25,8 @@ async function startApolloServer() {
   server.applyMiddleware({ app });
   app.use('/uploads',express.static(path.join(__dirname,'uploads')))
   require("dotenv").config();
+  app.use(express.urlencoded({ extended : true }));
+app.use(express.json());
   app.use(cors({ origin: true }));
   connectDB();
   app.listen({ port: process.env.PORT || 4000 }, () => {

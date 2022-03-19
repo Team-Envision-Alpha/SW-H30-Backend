@@ -1,26 +1,23 @@
 const { gql } = require("apollo-server-express");
 const { UserInputError } = require("apollo-server-core");
-const uuid = require("uuid");
 const { dbClient } = require("../db");
 const { isAuthenticated } = require("../validators/auth");
 
 const typeDefs = gql`
     input InviteInput {
         eventId:ID!
-        userId: ID
         email: String!
         name: String!
         phone: String!
     }
-    type InvitedUser {
-        userid: ID
+    type Inviteduser {
         email: String!
         name: String!
         phone: String!
     }
     # invite user Queries 
     extend type Query {
-        getAllInvitedUsers(eventId:ID!) : [InvitedUser]
+        getAllInvitedUsers(eventId:ID!) : [Inviteduser]
     }
     # invite user Mutations 
     extend type Mutation{
@@ -49,8 +46,8 @@ const resolvers = {
             let queries = []
             queries = await inviteInput.map(({eventId,userId,name,email,phone})=>{
                 return {
-                    query:"insert into aicte.invited_users (eventId,userId,name,email,phone) values (?,?,?,?,?)",
-                    params:[eventId,userId,name,email,phone]
+                    query:"insert into aicte.invited_users (eventId,name,email,phone) values (?,?,?,?)",
+                    params:[eventId,name,email,phone]
                 }
             })
             await dbClient.batch(queries)
