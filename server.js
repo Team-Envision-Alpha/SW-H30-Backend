@@ -34,6 +34,6 @@ app.use(express.json());
   });
   return app;
 }
-
 // startApolloServer();
+// export serverless app for AWS Lambda
 module.exports.handler = serverless(startApolloServer);
