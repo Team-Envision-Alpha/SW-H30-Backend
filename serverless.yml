@@ -12,6 +12,10 @@ provider:
 functions:
   hello:
     handler: handler.hello
+    - http: 
+          path: /hello
+          method: ANY
+          cors: true
   graphql:
     handler: server.handler
     events:

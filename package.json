@@ -17,6 +17,7 @@
     "apollo-server": "^3.6.3",
     "apollo-server-core": "^3.6.3",
     "apollo-server-express": "^3.6.3",
+    "apollo-server-lambda": "^3.8.2",
     "bcryptjs": "^2.4.3",
     "cassandra-driver": "^4.6.3",
     "cors": "^2.8.5",
