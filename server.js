@@ -5,7 +5,7 @@ const { ApolloServer } = require("apollo-server-express");
 const {
   ApolloServerPluginLandingPageGraphQLPlayground,
 } = require("apollo-server-core");
-
+const serverless = require('serverless-http');
 const { connectDB } = require("./db");
 
 async function startApolloServer() {
@@ -32,6 +32,8 @@ app.use(express.json());
   app.listen({ port: process.env.PORT || 4000 }, () => {
     console.log("Server up");
   });
+  return app;
 }
 
-startApolloServer();
+// startApolloServer();
+module.exports.handler = serverless(startApolloServer);

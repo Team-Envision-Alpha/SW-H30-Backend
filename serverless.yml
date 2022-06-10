@@ -1,0 +1,21 @@
+service: aicte-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: 20201221
+  region: ap-south-1
+  stage: dev
+
+functions:
+  hello:
+    handler: handler.hello
+  graphql:
+    handler: server.handler
+    events:
+      - http: 
+          path: /graphql
+          method: ANY
+          cors: true
