@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -35,5 +36,8 @@
   "bugs": {
     "url": "https://github.com/Team-Envision-Alpha/SW-H30-Backend/issues"
   },
-  "homepage": "https://github.com/Team-Envision-Alpha/SW-H30-Backend#readme"
+  "homepage": "https://github.com/Team-Envision-Alpha/SW-H30-Backend#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
 }
